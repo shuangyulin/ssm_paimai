@@ -1,0 +1,50 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ProductBiddingMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加竞拍订单记录 -->
+	<insert id="addProductBidding" parameterType="productBidding">
+		insert into t_productBidding(itemObj,userObj,biddingTime,biddingPrice) values 
+		(#{itemObj.itemId},#{userObj.user_name},#{biddingTime},#{biddingPrice})
+	</insert>
+
+	<!-- 按照查询条件分页查询竞拍订单记录 -->
+	<select id="queryProductBidding" resultMap="productBiddingMap" >
+		select t_productBidding.* from t_productBidding,t_item,t_userInfo ${where} and t_productBidding.itemObj = t_item.itemId and t_productBidding.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="productBiddingMap" type="productBidding">
+        <id property="biddingId" column="biddingId" />
+        <association property="itemObj" column="itemObj" select="com.chengxusheji.mapper.ItemMapper.getItem" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有竞拍订单记录 -->
+	<select id="queryProductBiddingList" resultMap="productBiddingMap" >
+		select t_productBidding.* from t_productBidding,t_item,t_userInfo ${where} and t_productBidding.itemObj = t_item.itemId and t_productBidding.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的竞拍订单记录数 -->
+	<select id="queryProductBiddingCount" resultType="int">
+		select count(*) from t_productBidding,t_item,t_userInfo ${where} and t_productBidding.itemObj = t_item.itemId and t_productBidding.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个竞拍订单记录 -->
+	<select id="getProductBidding" parameterType="int" resultMap="productBiddingMap">
+		select * from t_productBidding where t_productBidding.biddingId = #{biddingId}
+	</select>
+
+	<!-- 更新竞拍订单记录 -->
+	<update id="updateProductBidding" parameterType="productBidding">
+		update t_productBidding set itemObj=#{itemObj.itemId},userObj=#{userObj.user_name},biddingTime=#{biddingTime},biddingPrice=#{biddingPrice} where biddingId = #{biddingId}
+	</update>
+
+	<!-- 删除竞拍订单记录 -->
+	<delete id="deleteProductBidding" parameterType="int">
+		delete from t_productBidding where biddingId=#{biddingId}
+	</delete>
+
+</mapper>

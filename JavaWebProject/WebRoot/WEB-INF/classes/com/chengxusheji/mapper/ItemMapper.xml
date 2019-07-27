@@ -1,0 +1,50 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ItemMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加商品记录 -->
+	<insert id="addItem" parameterType="item">
+		insert into t_item(itemClassObj,pTitle,itemPhoto,itemDesc,userObj,startPrice,startTime,endTime) values 
+		(#{itemClassObj.classId},#{pTitle},#{itemPhoto},#{itemDesc},#{userObj.user_name},#{startPrice},#{startTime},#{endTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询商品记录 -->
+	<select id="queryItem" resultMap="itemMap" >
+		select t_item.* from t_item,t_itemClass,t_userInfo ${where} and t_item.itemClassObj = t_itemClass.classId and t_item.userObj = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="itemMap" type="item">
+        <id property="itemId" column="itemId" />
+        <association property="itemClassObj" column="itemClassObj" select="com.chengxusheji.mapper.ItemClassMapper.getItemClass" />
+        <association property="userObj" column="userObj" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有商品记录 -->
+	<select id="queryItemList" resultMap="itemMap" >
+		select t_item.* from t_item,t_itemClass,t_userInfo ${where} and t_item.itemClassObj = t_itemClass.classId and t_item.userObj = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的商品记录数 -->
+	<select id="queryItemCount" resultType="int">
+		select count(*) from t_item,t_itemClass,t_userInfo ${where} and t_item.itemClassObj = t_itemClass.classId and t_item.userObj = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个商品记录 -->
+	<select id="getItem" parameterType="int" resultMap="itemMap">
+		select * from t_item where t_item.itemId = #{itemId}
+	</select>
+
+	<!-- 更新商品记录 -->
+	<update id="updateItem" parameterType="item">
+		update t_item set itemClassObj=#{itemClassObj.classId},pTitle=#{pTitle},itemPhoto=#{itemPhoto},itemDesc=#{itemDesc},userObj=#{userObj.user_name},startPrice=#{startPrice},startTime=#{startTime},endTime=#{endTime} where itemId = #{itemId}
+	</update>
+
+	<!-- 删除商品记录 -->
+	<delete id="deleteItem" parameterType="int">
+		delete from t_item where itemId=#{itemId}
+	</delete>
+
+</mapper>
