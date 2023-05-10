@@ -1,0 +1,48 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.ItemClassMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加商品类别记录 -->
+	<insert id="addItemClass" parameterType="itemClass">
+		insert into t_itemClass(className,classDesc) values 
+		(#{className},#{classDesc})
+	</insert>
+
+	<!-- 按照查询条件分页查询商品类别记录 -->
+	<select id="queryItemClass" resultMap="itemClassMap" >
+		select t_itemClass.* from t_itemClass ${where} limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="itemClassMap" type="itemClass">
+        <id property="classId" column="classId" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有商品类别记录 -->
+	<select id="queryItemClassList" resultMap="itemClassMap" >
+		select t_itemClass.* from t_itemClass ${where}
+	</select>
+
+    <!-- 按照查询条件的商品类别记录数 -->
+	<select id="queryItemClassCount" resultType="int">
+		select count(*) from t_itemClass ${where}
+	</select>
+
+	<!-- 根据主键查询某个商品类别记录 -->
+	<select id="getItemClass" parameterType="int" resultMap="itemClassMap">
+		select * from t_itemClass where t_itemClass.classId = #{classId}
+	</select>
+
+	<!-- 更新商品类别记录 -->
+	<update id="updateItemClass" parameterType="itemClass">
+		update t_itemClass set className=#{className},classDesc=#{classDesc} where classId = #{classId}
+	</update>
+
+	<!-- 删除商品类别记录 -->
+	<delete id="deleteItemClass" parameterType="int">
+		delete from t_itemClass where classId=#{classId}
+	</delete>
+
+</mapper>

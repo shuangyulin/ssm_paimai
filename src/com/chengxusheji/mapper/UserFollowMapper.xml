@@ -1,0 +1,50 @@
+<!DOCTYPE mapper  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--namespace命名空间，为了对sql语句进行隔离，方便管理，mapper开发dao方式，使用namespace有特殊作用  
+mapper代理开发时将namespace指定为mapper接口的全限定名  
+ -->
+<mapper namespace="com.chengxusheji.mapper.UserFollowMapper"> 
+<!--在mapper.xml文件中配置很多的sql语句，执行每个sql语句时，封装为MappedStatement对象 
+mapper.xml以statement为单位管理sql语句  
+ -->
+	<!-- 添加用户关注记录 -->
+	<insert id="addUserFollow" parameterType="userFollow">
+		insert into t_userFollow(userObj1,userObj2,followTime) values 
+		(#{userObj1.user_name},#{userObj2.user_name},#{followTime})
+	</insert>
+
+	<!-- 按照查询条件分页查询用户关注记录 -->
+	<select id="queryUserFollow" resultMap="userFollowMap" >
+		select t_userFollow.* from t_userFollow,t_userInfo ${where} and t_userFollow.userObj1 = t_userInfo.user_name and t_userFollow.userObj2 = t_userInfo.user_name limit #{startIndex},#{pageSize}
+	</select>
+	<resultMap id="userFollowMap" type="userFollow">
+        <id property="followId" column="followId" />
+        <association property="userObj1" column="userObj1" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+        <association property="userObj2" column="userObj2" select="com.chengxusheji.mapper.UserInfoMapper.getUserInfo" />
+    </resultMap>
+
+    <!-- 按照查询条件查询所有用户关注记录 -->
+	<select id="queryUserFollowList" resultMap="userFollowMap" >
+		select t_userFollow.* from t_userFollow,t_userInfo ${where} and t_userFollow.userObj1 = t_userInfo.user_name and t_userFollow.userObj2 = t_userInfo.user_name
+	</select>
+
+    <!-- 按照查询条件的用户关注记录数 -->
+	<select id="queryUserFollowCount" resultType="int">
+		select count(*) from t_userFollow,t_userInfo ${where} and t_userFollow.userObj1 = t_userInfo.user_name and t_userFollow.userObj2 = t_userInfo.user_name
+	</select>
+
+	<!-- 根据主键查询某个用户关注记录 -->
+	<select id="getUserFollow" parameterType="int" resultMap="userFollowMap">
+		select * from t_userFollow where t_userFollow.followId = #{followId}
+	</select>
+
+	<!-- 更新用户关注记录 -->
+	<update id="updateUserFollow" parameterType="userFollow">
+		update t_userFollow set userObj1=#{userObj1.user_name},userObj2=#{userObj2.user_name},followTime=#{followTime} where followId = #{followId}
+	</update>
+
+	<!-- 删除用户关注记录 -->
+	<delete id="deleteUserFollow" parameterType="int">
+		delete from t_userFollow where followId=#{followId}
+	</delete>
+
+</mapper>
